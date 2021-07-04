@@ -1,7 +1,8 @@
 use rocket_contrib::json::Json;
 use rocket::response::status;
-use crate::models::{Project, NewProject};
+use crate::models::{Project, NewProject, Task, NewTask};
 use crate::db_connection::DbConnection;
+use rocket::Request;
 
 
 #[get("/")]
@@ -37,4 +38,46 @@ pub fn delete_project(connection: DbConnection, project_id: i32) -> status::NoCo
     Project::destroy(connection, project_id);
 
     status::NoContent
+}
+
+
+#[get("/<project_id>/tasks")]
+pub fn list_tasks(connection: DbConnection, project_id: i32) -> Json<Vec<Task>> {
+    let result = Task::index(connection, project_id);
+
+    Json(result)
+}
+
+#[get("/<project_id>/tasks/<task_id>")]
+pub fn show_task(connection: DbConnection, project_id: i32, task_id: i32) -> Json<Task> {
+    let result = Task::show(connection, project_id, task_id);
+
+    Json(result)
+}
+
+#[post("/<project_id>/tasks", data = "<new_task>")]
+pub fn create_task(connection: DbConnection, project_id: i32, new_task: Json<NewTask>) -> Json<Task> {
+    let result = Task::create(connection, project_id, new_task);
+
+    Json(result)
+}
+
+#[put("/<project_id>/tasks/<task_id>", data = "<updated_task>")]
+pub fn update_task(connection: DbConnection, project_id: i32, task_id: i32, updated_task: Json<NewTask>) -> Json<Task> {
+    let result = Task::update(connection, project_id, task_id, updated_task);
+
+    Json(result)
+}
+
+#[delete("/<project_id>/tasks/<task_id>")]
+pub fn delete_task(connection: DbConnection, project_id: i32, task_id: i32) -> status::NoContent {
+    Task::destroy(connection, project_id, task_id);
+
+    status::NoContent
+}
+
+
+#[catch(404)]
+pub fn not_found(req: &Request) -> String {
+    format!("Sorry, '{}' is not a valid path.", req.uri())
 }

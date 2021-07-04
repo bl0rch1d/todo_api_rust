@@ -13,9 +13,22 @@ mod operations;
 use crate::db_connection::DbConnection;
 use routes::*;
 
+
 fn main() {
     rocket::ignite()
         .attach(DbConnection::fairing())
-        .mount("/", routes![list_projects, create_project, update_project, delete_project, show_project])
+        .mount("/api/v1/projects/", routes![
+            list_projects,
+            create_project,
+            update_project,
+            delete_project,
+            show_project,
+            list_tasks,
+            create_task,
+            show_task,
+            update_task,
+            delete_task,
+        ])
+        .register(catchers![not_found])
         .launch();
 }
