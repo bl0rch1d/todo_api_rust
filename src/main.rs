@@ -29,6 +29,8 @@ fn main() {
             update_task,
             delete_task,
         ])
-        .register(catchers![not_found])
+        .register(catchers![
+            not_found
+        ])
         .launch();
 }
